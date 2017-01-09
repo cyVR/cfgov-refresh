@@ -7,6 +7,7 @@ var BaseTransition = require( '../modules/transition/BaseTransition' );
 var ERROR_MESSAGES = require( '../config/error-messages-config' );
 var FORM_MESSAGES = ERROR_MESSAGES.FORM.SUBMISSION;
 var Notification = require( '../molecules/Notification' );
+var EventObserver = require( '../modules/util/EventObserver' );
 
 /**
  * FormSubmit
@@ -17,7 +18,7 @@ var Notification = require( '../molecules/Notification' );
  * @param {HTMLNode} element
  *   The DOM element within which to search for the organism.
  * @param {string} baseClass class of organism
- * @param {Object} opts optional params, including
+ * @param {object} opts optional params, including
  *   validator: validation function, and
  *   replaceForm: Boolean, determines if form is replaced with message
  * @returns {FormSubmit} An instance.
@@ -30,6 +31,11 @@ function FormSubmit( element, baseClass, opts ) {
   var _notificationElement = _baseElement.querySelector( '.m-notification' );
   var _notification = new Notification( _baseElement );
   var _cachedFields;
+  var eventObserver = new EventObserver();
+  var self = this;
+  this.addEventListener = eventObserver.addEventListener;
+  this.removeEventListener = eventObserver.removeEventListener;
+  this.dispatchEvent = eventObserver.dispatchEvent;
 
   /**
    * @returns {FormSubmit|undefined} An instance,
@@ -41,13 +47,12 @@ function FormSubmit( element, baseClass, opts ) {
     }
     _cachedFields = _cacheFields();
     _formElement.addEventListener( 'submit', _onSubmit );
-
     return this;
   }
 
   /**
-   * @param {event} event DOM event
-   * @returns {event} DOM event.
+   * @param {object} event DOM event
+   * @returns {object} DOM event.
    */
   function _onSubmit( event ) {
     event.preventDefault();
@@ -55,7 +60,7 @@ function FormSubmit( element, baseClass, opts ) {
     if ( errors ) {
       _displayNotification( _notification.ERROR, errors );
     } else {
-      _submitForm();
+      _submitForm( event );
     }
 
     return event;
@@ -73,8 +78,8 @@ function FormSubmit( element, baseClass, opts ) {
 
   /**
    * Displays notification and scrolls it into view if offscreen
-   * @param {type} type of notification
-   * @param {content} content for notification.
+   * @param {string} type of notification
+   * @param {string} content for notification.
    */
   function _displayNotification( type, content ) {
     _notification.setTypeAndContent( type, content );
@@ -84,9 +89,9 @@ function FormSubmit( element, baseClass, opts ) {
 
   /**
    * Sends form data and displays notification on success / failure.
-   * @param {formData} form data object with field name/value pairs
+   * @param {object} event form submit event
    */
-  function _submitForm() {
+  function _submitForm( event ) {
     var DONE_CODE = 4;
     var SUCCESS_CODES = {
       200: 'ok',
@@ -113,17 +118,21 @@ function FormSubmit( element, baseClass, opts ) {
             result = response.result;
             message = response.message;
             heading = response.header;
-          } catch( err ) {
+          } catch ( err ) {
             // ignore lack of response
           }
           state = result === 'fail' ? 'ERROR' : 'SUCCESS';
         }
-        if ( state === 'SUCCESS' && opts.replaceForm ) {
+
+        message = message || FORM_MESSAGES[state];
+        if ( opts.replaceForm && state === 'SUCCESS' ) {
           heading = heading || 'Thank you!';
           _replaceFormWithNotification( heading + ' ' + message );
         } else {
-          _displayNotification( _notification[state],
-                              message || FORM_MESSAGES[state] );
+          _displayNotification( _notification[state], message );
+        }
+        if ( state === 'SUCCESS' ) {
+          self.dispatchEvent( 'success', event );
         }
       }
     };
@@ -154,7 +163,7 @@ function FormSubmit( element, baseClass, opts ) {
   }
 
   /**
-   * @returns {obj} form fields, keyed by name.
+   * @returns {object} form fields, keyed by name.
    *   Checkboxes and radio fields are stored in array.
    */
   function _cacheFields() {
