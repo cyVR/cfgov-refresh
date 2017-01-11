@@ -20,9 +20,9 @@ function emailValidation( fields ) {
 }
 
 function storeEmailListCode( code ) {
-  var emailSignups = webStorageProxy.getItem( EMAIL_LIST_KEY, localStorage );
+  var emailSignups;
   try {
-    emailSignups = JSON.parse( emailSignups );
+    emailSignups = JSON.parse( webStorageProxy.getItem( EMAIL_LIST_KEY, localStorage ) );
   } catch (e) {}
   if ( !isArray( emailSignups ) ) {
     emailSignups = [ code ];
