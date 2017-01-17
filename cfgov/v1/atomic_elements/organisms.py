@@ -16,7 +16,7 @@ from wagtail.wagtailsnippets.blocks import SnippetChooserBlock
 
 from . import atoms, molecules
 from .. import blocks as v1_blocks
-from ..models.snippets import Contact as ContactSnippetClass
+from v1.models.snippets import Contact as ContactSnippetClass, ReusableText
 from ..util import ref
 
 
@@ -508,6 +508,7 @@ class FullWidthText(blocks.StreamBlock):
     related_links = molecules.RelatedLinks()
     table = Table(editable=False)
     table_block = AtomicTableBlock(table_options={'renderer': 'html'})
+    reusable_text = SnippetChooserBlock(ReusableText)
 
     class Meta:
         icon = 'edit'

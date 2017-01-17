@@ -11,6 +11,14 @@ from ..atomic_elements import molecules
 
 
 @register_snippet
+class ReusableText(models.Model):
+    text = RichTextField(blank=True)
+
+    def __str__(self):
+        return self.text
+
+
+@register_snippet
 class Contact(models.Model):
     heading = models.CharField(verbose_name=('Heading'), max_length=255,
                                help_text=("The snippet heading"))
