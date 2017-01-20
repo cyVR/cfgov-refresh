@@ -12,17 +12,13 @@
 
    ========================================================================== #}
 
-<div class="o-full-width-text-group">
+<div class="o-full-width-text-group"><div class="m-inset">
     {% for block in value %}
-        {% if 'content_with_anchor' in block.block_type %}
+        {% if 'content_with_anchor' in block.block_type or 'table' in block.block_type %}
                 {{ render_stream_child(block) | safe }}
         {% elif 'content' in block.block_type %}
             <div class="m-full-width-text">
                 {{ parse_links(block.value) | safe }}
-            </div>
-        {% elif 'table' in block.block_type %}
-            <div class="m-full-width-text">
-                {{ render_stream_child(block) | safe}}
             </div>
         {% elif 'media' in block.block_type %}
             <div class="m-full-width-media">
@@ -30,9 +26,7 @@
                 <img class="m-full-width-media_image" src="{{ media.url }}" alt="{{ media.alt }}">
             </div>
         {% else %}
-            <div class="m-inset">
-                {{ block | safe }}
-            </div>
+            {{ block | safe }}
         {% endif %}
     {% endfor %}
-</div>
+</div></div>
