@@ -46,7 +46,7 @@
             'replaces four disclosure forms with two new ones. ' +
             'We have resources to help you comply.'
 } %}
-{% if flag_enabled(request, 'DEBT_COLLECTION_RELEASE') %}
+{% if flag_enabled('DEBT_COLLECTION_RELEASE') %}
     {% set consumer_tools_content = {
         'link': {
             'text': 'Stories about debt collection',
@@ -166,7 +166,7 @@
 )] -%}
 
 
-{% if flag_enabled(request, 'PREPAID_RELEASE') %}
+{% if flag_enabled('PREPAID_RELEASE') %}
     {{ nav_items[0][0][2][1].append( ('Prepaid Cards', '/consumer-tools/prepaid-cards/', [(
         ('Choose the Right Card for Your Situation', '/consumer-tools/prepaid-cards/choose-the-right-card/', []),
         ('Know Your Rights', '/consumer-tools/prepaid-cards/know-your-rights/', []),
@@ -174,7 +174,7 @@
     )]) ) }}
 {% endif %}
 
-{% if flag_enabled(request, 'DEBT_COLLECTION_RELEASE') %}
+{% if flag_enabled('DEBT_COLLECTION_RELEASE') %}
     {{ nav_items[0][0][2][1].append(
         ('Debt Collection', '/consumer-tools/debt-collection/', [])
     ) }}
@@ -183,7 +183,7 @@
     ) }}
 {% endif %}
 
-{% if flag_enabled(request, 'CREDIT_TRENDS_RELEASE') %}
+{% if flag_enabled('CREDIT_TRENDS_RELEASE') %}
     {{ nav_items[0][2][2][2].insert( 0,
         ('Consumer Credit Trends', '/data-research/consumer-credit-trends/', [])
     ) }}

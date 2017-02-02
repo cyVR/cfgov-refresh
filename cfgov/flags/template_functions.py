@@ -1,26 +1,21 @@
-from django.core.exceptions import ObjectDoesNotExist
-from wagtail.wagtailcore.models import Site
+from flags.utils import flags_enabled as utils_flag_enabled
 
-from flags.models import Flag
-
-
-def flag_enabled(request, key):
-    site = Site.find_for_request(request)
-
-    try:
-        return site.flag_states.get(flag_id=key).enabled
-    except ObjectDoesNotExist:
-        pass
-
-    try:
-        return Flag.objects.get(key=key).enabled_by_default
-    except ObjectDoesNotExist:
-        return False
+from jinja2 import contextfunction
 
 
-def flags_enabled(request, *keys):
-    return all(flag_enabled(request, key) for key in keys)
+@contextfunction
+def flag_enabled(context, key):
+    request = None
+    if context:
+        request = context.get('request')
+    return utils_flag_enabled(request, key)
 
 
-def flag_disabled(request, key):
-    return not flag_enabled(request, key)
+@contextfunction
+def flags_enabled(context, *keys):
+    return all(flag_enabled(context, key) for key in keys)
+
+
+@contextfunction
+def flag_disabled(context, key):
+    return not flag_enabled(context, key)

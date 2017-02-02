@@ -14,6 +14,7 @@ from wagtail.wagtailcore import urls as wagtail_urls
 from wagtail.wagtailcore import views
 
 from core.views import ExternalURLNoticeView
+from flags.utils import is_flag_enabled
 from legacy.views import (HousingCounselorPDFView, dbrouter_shortcut,
                           token_provider)
 from sheerlike.sites import SheerSite
@@ -373,6 +374,33 @@ if settings.DEBUG:
         url(r'^404/$',
             TemplateView.as_view(template_name='404.html'),
             name='404')
+    )
+
+if is_flag_enabled('BUREAU_WAGTAIL_CONVERSION'):
+    urlpatterns.append(
+        url(r'^the-bureau/(?P<path>.*)$', RedirectView.as_view(
+            url='/about-us/the-bureau/%(path)s', permanent=True))
+    )
+    urlpatterns.append(
+        url(r'^about-us/leadership-calendar/(?P<path>.*)$', RedirectView.as_view(
+            url='/about-us/the-bureau/leadership-calendar/%(path)s',
+            permanent=True))
+    )
+    urlpatterns.append(
+        url(r'^about-us/the-bureau/', include([
+            url(r'^$',
+                SheerTemplateView.as_view(
+                    template_name='about-us/the-bureau/index.html'),
+                    name='index'),
+            url(r'^leadership-calendar/',
+                lambda request: views.serve(request,
+                                            'about-us/leadership-calendar'),
+                       name='leadership-calendar'),
+            url(r'^(?P<page_slug>[\w-]+)/$',
+                SheerTemplateView.as_view(),
+                name='page'),
+            ],
+            namespace='the-bureau'))
     )
 
 
