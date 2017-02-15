@@ -1,0 +1,52 @@
+{% extends 'layout-2-1-bleedbar.html' %}
+
+{% import 'macros/time.html' as time %}
+
+{% block content_main_modifiers -%}
+    {{ super() }} content__flush-bottom
+{%- endblock %}
+
+{% block content_main %}
+
+{% import 'molecules/social-media.html' as social_media with context %}
+    <section class="block
+                    block__flush-top
+                    block__sub">
+        <h1>{{ page.title }}</h1>
+        <div class="content-l">
+            <div class="content-l_col content-l_col-1-2">
+            </div>
+        </div>
+    </section>
+
+    <section class="block
+                    block__padded-top
+                    block__border-top">
+        <h2>Answer</h2>
+        {{ page.description | safe }}
+    </section>
+
+
+
+{% endblock %}
+
+{% block content_sidebar_modifiers -%}
+    o-sidebar-content
+{%- endblock %}
+
+{% block content_sidebar scoped  %}
+<div class="block block__flush-top">
+</div>
+
+
+<p data-qa-hook="info-section-desc">
+    The CFPB is one of the most searched for agencies
+    in the federal government.
+    Connect with us to stay updated on the work
+    we do and new opportunities to be a part of it.
+</p>
+<a href="https://www.linkedin.com/company/consumer-financial-protection-bureau"
+   class="jump-link jump-link__external-link jump-link__underline">
+    Follow us on LinkedIn
+</a>
+{% endblock %}
