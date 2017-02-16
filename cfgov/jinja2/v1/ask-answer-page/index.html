@@ -23,7 +23,11 @@
                     block__padded-top
                     block__border-top">
         <h2>Answer</h2>
-        {{ page.description | safe }}
+        {% if page.short_answer %}
+        <h3 class="answer-snippet"><strong>Answer:</strong> {{ page.short_answer | safe }}</h3>
+        {% endif %}
+        <p> {{ page.answer | safe }} </p>
+
     </section>
 
 
