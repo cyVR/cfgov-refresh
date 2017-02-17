@@ -46,8 +46,8 @@ class AnswerPage(CFGOVPage):
 
     content_panels = CFGOVPage.content_panels + [
         FieldPanel('question'),
-        FieldPanel('answer', classname="full"),
         FieldPanel('one_sentence_answer', classname="full"),
+        FieldPanel('answer', classname="full"),
         FieldPanel('is_english'),
         FieldPanel('is_spanish'),
         FieldPanel('question_topic'),

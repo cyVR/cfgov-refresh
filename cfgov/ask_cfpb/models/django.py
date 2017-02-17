@@ -231,12 +231,12 @@ class Question(models.Model):
 class Answer(models.Model):
     topic = models.ForeignKey(QuestionTopic, blank=True, null=True)
     question = RichTextField(blank=True)
-    answer = RichTextField(blank=True)
     short_answer = RichTextField(blank=True)
+    answer = RichTextField(blank=True)
     slug = models.SlugField(max_length=255, blank=True)
     question_es = RichTextField(blank=True)
-    answer_es = RichTextField(blank=True)
     short_answer_es = RichTextField(blank=True)
+    answer_es = RichTextField(blank=True)
     slug_es = models.SlugField(max_length=255, blank=True)
 
     def __str__(self):
