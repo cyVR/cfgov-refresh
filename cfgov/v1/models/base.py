@@ -152,9 +152,8 @@ class CFGOVPage(Page):
 
     def related_posts(self, block, hostname):
         from v1.models.learn_page import AbstractFilterPage
-        related = {}
 
-        def fetch_children_by_specific_category(block, parent_slug):
+        def fetch_children(parent_slug):
             """
             This used to be a Page.objects.get, which would throw
             an exception if the requested parent wasn't found. As of
@@ -167,37 +166,34 @@ class CFGOVPage(Page):
             """
             parent = Page.objects.filter(slug=parent_slug).first()
             if parent:
-                child_query = Page.objects.child_of_q(parent)
-                if 'specific_categories' in block.value:
-                    child_query &= specific_categories_query(
-                        block, parent_slug)
-            else:
-                child_query = Q()
-            return child_query
+                return Page.objects.child_of_q(parent)
+            return Q()
 
         def specific_categories_query(block, parent_slug):
-            specific_categories = ref.related_posts_category_lookup(
-                block.value['specific_categories']
-            )
-            choices = [c[0] for c in ref.choices_for_page_type(parent_slug)]
+            specific_categories = block.value['specific_categories']
+            choices = [c[0] for c in dict(ref.categories)[parent_slug.title()]]
             categories = [c for c in specific_categories if c in choices]
             if categories:
                 return Q(('categories__name__in', categories))
-            else:
-                return Q()
+            return Q()
+        related = {}
+        tag_query = models.Q(('tags__name__in', self.tags.names()))
 
         for slug in ['blog', 'newsroom', 'events']:
             if block.value.get('relate_{}'.format(slug)):
-                search_query = models.Q(('tags__name__in', self.tags.names()))
-                search_query &= fetch_children_by_specific_category(
-                    block=block,
+                search_query = fetch_children(
                     parent_slug=slug
-                )
-                if slug == 'events':
-                    search_query |= fetch_children_by_specific_category(
-                        block=block,
+                ) & tag_query
+                if slug == 'events': # Grab additional archive posts 
+                    search_query |= fetch_children(
                         parent_slug='archive-past-events'
+                    ) & tag_query
+                else: 
+                    search_query &= specific_categories_query(
+                        block=block,
+                        parent_slug=slug
                     )
+
                 related[slug.title()] = (
                     AbstractFilterPage.objects.
                     live_shared(hostname).filter(search_query).
