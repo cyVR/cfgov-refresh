@@ -1,0 +1,7 @@
+{% load facet_helper %}
+<article class="question question_summary">
+  
+  <a href="{{q.get_absolute_url}}" class="partially-styled-link"> 
+    <span class="unstyled">{{ q.title|safe }} </span><span class="styled">Read answer</span>
+  </a>
+</article>

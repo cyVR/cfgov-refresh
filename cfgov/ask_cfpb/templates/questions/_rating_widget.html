@@ -1,0 +1,88 @@
+<div class="cf-notification 
+            cf-notification__success
+            comment-success">
+  <div class="wrapper wrapper__match-content cf-notification_wrapper">
+    <span class="cf-notification_icon cf-notification_icon__success cf-icon cf-icon-approved-round"></span>
+    <div class="cf-notification_text">
+      <div class="data-text">Thank you for your feedback!</div>
+    </div>
+  </div>
+</div>
+
+<form method="post" action="{{question.get_rating_url}}" class="rateq block block__bg block block__border-bottom block__border-top block__border-right block__border-left block__padded-top">
+  {% csrf_token %}
+  
+  <div class="content-l">
+    <fieldset class="u-reset">
+          <div class="form-l_col
+                      form-l_col-1
+                      form-l_col__flush-bottom">
+              <legend>
+                  <span class="h4">Was this answer helpful to you?</span>
+              </legend>
+          </div>
+          <div class="rating-inputs">
+            <div class="form-l_col
+                        form-l_col-1-3
+                        form-l-inset">
+                <div class="form-l-inset_container">
+                    <input class="cf-input"
+                           type="radio"
+                           name="helpful"
+                           value='1' 
+                           {% if ratings.0 == '1'%} checked='checked'{% endif %}
+                           id="helpful_1">
+                    <label class="cf-input_label"
+                           for="helpful_1">
+                        Yes
+                    </label>
+                </div>
+            </div>
+            <div class="form-l_col
+                        form-l_col-1-3
+                        form-l-inset">
+                <div class="form-l-inset_container">
+                    <input class="cf-input"
+                           type="radio"
+                           name="helpful"
+                           value="0"
+                           {% if ratings.0 == '0'%} checked='checked'{% endif %}
+                           id="helpful_0">
+                    <label class="cf-input_label"
+                           for="helpful_0">
+                        No
+                    </label>
+                </div>
+            </div>
+            <div class="form-l_col
+                        form-l_col-1-3
+                        message-column">
+              <div class="rating-message">
+                <span class="cf-icon cf-icon-approved-round rating-message_icon"></span>
+                <span class="rating-message_text">Thank you for your feedback!</span>
+              </div>
+            </div>
+          </div>
+      </fieldset>
+    
+      <fieldset class="u-reset">
+        <div class="form-l_col
+                    form-l_col-1
+                    form-l_col__flush-bottom">
+          <legend>
+            <span class="short-desc"><em>Optional</em> </span><span class="h4">Additional comment</span> 
+          </legend>
+        </div>
+        <div class="form-l_col
+                    form-l_col-1
+                    feedback-col">
+          <textarea rows=2 name='looking_for'>{% if ratings.1 %} {{ ratings.1 }} {% endif %}</textarea>
+        </div>
+        <div class="form-l_col
+                    form-l_col-1">
+          <button class="btn" type="submit">Submit comment</button>
+        </div>
+        <input type='hidden' name='action' value='add'/>
+      </fieldset>
+   </div> 
+</form>

@@ -1,0 +1,16 @@
+{% extends "front/base_update.html" %}
+{% load static from staticfiles %}
+
+
+{% block app_css %}
+<link rel="stylesheet" href="{% static "knowledgebase/knowledgebase.css" %}"/>
+
+
+<link rel="stylesheet" type="text/css" href="{% static "jquery/jquery-ui-1.9.2.custom.min.css" %}" />
+
+{% endblock %}
+
+{% block app_js %}
+<script src='{% static "jquery/jquery-ui-1.9.2.custom.min.js" %}'></script>
+<script>var searchAPI= '{% url "api-search" %}';</script>
+{% endblock %}

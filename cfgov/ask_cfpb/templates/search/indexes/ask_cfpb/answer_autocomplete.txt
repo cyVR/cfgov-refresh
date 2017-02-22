@@ -1,0 +1,3 @@
+{% for question in object.cleaned_questions %}
+{{ question }}
+{% endfor %}

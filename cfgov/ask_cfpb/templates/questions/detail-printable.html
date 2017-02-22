@@ -1,0 +1,74 @@
+{% extends "front/base_print.html"%}
+{% load footnotify %}
+{% block title%}{{answer.title|safe}}{% endblock %}
+{% block page_meta %}
+<meta charset="UTF-8" />
+<meta property="og:title" content="{{answer.title|safe}}"/>
+<meta property="og:type" content="government"/>
+<meta property="og:url" content="{{ answer.get_absolute_url}}"/>
+<meta name="robots" content="noindex" />
+{% endblock %}
+{% block page_css %}
+<link rel="stylesheet" href="{% static "knowledgebase/knowledgebase.css" %}"/>
+{% endblock %}
+
+{% block content %}
+<p class="meta"><a href="{{answer.get_absolute_url}}" class="rarrow">Return to original question</a></p>
+<article>
+
+	<span class="meta qcat">{{ answer.question.question_category.name }}</span>
+	<h1>{{ answer.title|safe }}</h1>
+	<time datetime='{{ answer.question.updated_at|date:"Y-m-d" }}' pubdate class="meta qup">updated {{ answer.question.updated_at|date}}</time>
+		{% footnotify %}
+		<div class="qans">{{ answer.answer|safe }}</div>
+
+    {% for uitem in answer.sorted_upsellitems.all %}
+      {% if forloop.first %}
+        <aside class="upsell">
+          <h2>Get Help</h2>
+          {{  answer.question.override_gethelp_text|default:""|safe }}
+          <ul>
+      {% endif %}
+      <li>
+        {% if uitem.show_title == True %}
+          <p><h3>{{ uitem.title }}</h3></p>
+        {% endif %}
+        {{ uitem.text | safe }}
+        </li>
+      {% if forloop.last %}
+        </ul>
+        </aside>
+      {% endif %}
+    {% endfor %}
+
+		{% for a in answer.get_related_answers %}
+		{% if forloop.first %}
+		<aside class="related">
+		<h2>Related Questions</h2>
+		<ul>{% endif %}
+		<li><a href="{{a.get_absolute_url}}">{{a.title|safe}}</a></li>
+		{% if forloop.last %}
+		</ul>
+		</aside>
+		{% endif %}
+		{% endfor %}
+
+		{% endfootnotify %}
+
+		{% if footnotes %}
+		<aside class="footnotes">
+		<h2>Links</h2>
+		<ol>
+		{% for footnote in footnotes %}
+		<li>{{ footnote.1}}</li>
+		{% endfor %}
+		</ol>
+		</aside>
+		{% endif %}
+		<footer id="footer">
+		<h5>About these answers</h5>
+		<p>These answers are provided for general informational purposes only. While they can’t give you advice for your exact situation, we hope they can help you understand financial products and services better. They are not legal advice or a legal interpretation of the CFPB.</p>
+		<p class="thisurl">http://consumerfinance.gov{{answer.get_absolute_url}}</p>
+		</footer>
+
+{% endblock %}

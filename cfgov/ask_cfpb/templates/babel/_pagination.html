@@ -1,0 +1,16 @@
+{% load search %}
+{% load static from staticfiles %}
+
+                        {% if page.has_previous %}
+                        <li><a href="{% pagination_link page.previous_page_number 1 %}"><img src="{% static "nemo/_/img/icon-arrow-left-retina.png" %}" alt="Previous Page" class="icon-18"></a></li>
+                        {% endif %}
+                        {% for p in paginator.page_range %}
+                            {% if page.number == p %}
+                                <li><span class="s-active">{{ p }}</span></li>
+                            {% else %}
+                                <li><a href="{% pagination_link p 1 %}">{{ p }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if page.has_next %}
+                        <li><a href="{% pagination_link page.next_page_number 1 %}"><img src="{% static "nemo/_/img/icon-arrow-right-retina.png" %}" alt="Next Page" class="icon-18"></a></li>
+                        {% endif %}                        

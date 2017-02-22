@@ -1,24 +1,16 @@
+"""
+Script for exporting original knowledgebase English answers to a spreadsheet.
+"""
 import datetime
 
+import HTMLParser
 from django.utils import html
+
 from paying_for_college.csvkit import csvkit
 
 from knowledgebase.models import Question
 
-"""
-output goals:
-- Question ID
-- Question
-- English answer (richtext?)
-- English short answer
-- URL
-- status
-- Topic
-- Categories, pipe-delimited
-- Audiences
-- Related Questions (ID/question)
-- Upsell items
-"""
+html_parser = HTMLParser.HTMLParser()
 
 HEADINGS = [
     'ASK_ID',
@@ -35,6 +27,11 @@ HEADINGS = [
 ]
 
 
+def clean_and_strip(data):
+    unescaped = html_parser.unescape(data)
+    return html.strip_tags(unescaped)
+
+
 def assemble_output():
     english_questions = Question.objects.exclude(englishanswer=None)
     output_rows = []
@@ -42,8 +39,9 @@ def assemble_output():
         output = {heading: '' for heading in HEADINGS}
         output['ASK_ID'] = q.id
         output['Question'] = q.title
-        output['Answer'] = html.strip_tags(q.englishanswer.answer)
-        output['ShortAnswer'] = html.strip_tags(
+        output['Answer'] = clean_and_strip(
+            q.englishanswer.answer)
+        output['ShortAnswer'] = clean_and_strip(
             q.englishanswer.one_sentence_answer)
         output['URL'] = q.englishanswer.get_absolute_url()
         output['Status'] = q.englishanswer.workflow_state

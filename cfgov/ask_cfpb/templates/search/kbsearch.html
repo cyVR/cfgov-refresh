@@ -1,0 +1,231 @@
+{% extends "questions/base_kb_responsive.html"%}
+{% load sorting %}
+{% load cache %}
+{% load facet_helper %}
+{% load search %}
+{% load static from staticfiles %}
+
+{% block page_meta %}
+{% if selected_category %} 
+  <meta property="og:title" content="{{selected_category|capfirst}}">
+{% endif %}
+{% if selected_category %} 
+  <meta property="og:description" content="{{selected_category.description|striptags|safe}}">
+  <meta name="description" content="{{selected_category.description|striptags|safe}}">
+{% endif %}
+{% endblock %}
+
+{% block title %}
+	{% if query and page.object_list%}
+	  Search Results for '{{ query }}'
+	{% elif selected_category %} 
+	  {{selected_category|capfirst}}
+  {% elif selected_audience %} 
+    {{ selected_audience|capfirst }}
+  {% else %}
+    Ask CFPB
+	{% endif %}
+	{% if selected_tags %} tagged as: {{ selected_tags|join:", "}} {% endif %}
+{% endblock %}
+
+{%block breadcrumbs%}
+{% endblock %}
+
+{% block content %}
+<main class="content content__1-3 search-page {% if query %}query-page{% else %}category-page{% endif %}" role="main">
+    {% if not query or not page.object_list  %}
+		  {% include "questions/_intro.html" %}
+		{% endif %}
+		<div class="content_wrapper">
+
+      <nav class="breadcrumbs">
+
+        <a class="breadcrumbs_link" href="{% url "index_page" %}">            
+          Ask CFPB
+        </a>
+        {% if selected_category %} 
+        <a class="breadcrumbs_link" href="{% url "kbsearch" %}?selected_facets=category_exact:{{slug}}"> 
+        {{selected_category|capfirst}}
+        </a>
+        {% endif %}
+      </nav>
+    </div>
+    <div class="wrapper content_wrapper content_wrapper__left-sidebar">
+        <aside class="content_sidebar content__flush-all-on-small">
+          <nav class="expandable o-secondary-navigation" aria-label="Section navigation">
+            <div class="expandable_header o-secondary-navigation_header">
+              <button class="expandable_target o-secondary-navigation_button">
+                <span class="expandable_header-left">
+                  Categories
+                </span>
+                <span class="expandable_header-right">
+                  <span class="expandable_cue-open">
+                    <span class="cf-icon cf-icon-down"></span>
+                  </span>
+                  <span class="expandable_cue-close">
+                    <span class="cf-icon cf-icon-up"></span>
+                  </span>
+                </span>
+              </button>
+            </div>
+            <div class="expandable_content o-secondary-navigation_content">
+              <ul class="o-secondary-navigation_list o-secondary-navigation_list__parents">
+                {% if selected_category %}
+                  {% for category in other_categories %}
+                    <li class="o-secondary-navigation_item o-secondary-navigation_item__parent ">
+                      <a class="m-nav-link m-nav-link__parent" href="{% url "kbsearch" %}?selected_facets=category_exact:{{category.slug}}">
+                        {{category}}
+                      </a>
+                    </li>
+            			{% endfor %}
+            		{% else %}
+            			{% cache 86400 ask_all_categories %}
+            				{% for category in categories %}
+            				  <li class="o-secondary-navigation_item o-secondary-navigation_item__parent ">
+                        <a class="m-nav-link m-nav-link__parent m-nav-link" href="{% url "kbsearch" %}?selected_facets=category_exact:{{category.slug}}">
+                          {{category}}
+                        </a>
+                      </li>
+            				{% endfor %}
+          				{% endcache %}
+                {% endif %}
+
+              </ul>
+            </div>
+          </nav>
+          
+          
+        </aside>
+        <section class="content_main content__flush-top-on-small">	
+          {% if selected_category.name %}
+              <h1>
+                <span class='category-icon cf-icon {{slug}}'></span>
+                {{ selected_category|capfirst }}
+              </h1>
+							<div class="h3 cat-desc">
+							  {{ selected_category.description|safe }}
+							</div>
+			    {% elif page.object_list and selected_audience %}
+            <h1>{{ selected_audience|capfirst }}</h1>
+          {% else %}
+            <h1>Ask CFPB</h1>
+					{% endif %}
+            
+
+    				<section class="search-results">
+    				  {% if selected_category %}	
+  							  <div id="facets">
+  							    {% include "questions/_facets.html" with subcategories=subcategories selected_categories=selected_categories base_uri=base_uri request=request selected_facets=selected_facets facets=facets.fields audience_count=audience_count selected_audiences=selected_audiences selected_category=selected_category%}
+  							  </div>
+    					{% elif page.object_list and query %}
+                  <div class="query-search">
+                    {% include "questions/_searchbar.html" with position="right"%} 
+                  </div>    
+    							<h3 class="results-header">Results for ‘{{ query }}’</h3>
+    							{% if selected_tags %}<p class="meta tagged"><strong>tagged as</strong>: {{ selected_tags|join:", "}}</p>
+    							{% endif %}
+    					{% endif %}
+            <div class="questions-list">
+    				  {% for result in page.object_list %}
+      				  {% if query %}
+      					  {% include "questions/_summary_search.html" with q=result.object%}
+    						{% else %}	
+    						  {% include "questions/_summary_cat.html" with q=result.object%}
+      					{% endif %}
+      					{% if forloop.last %}
+      					  <nav class="pagination u-mt20">
+
+                      <a class="btn btn__super {% if page.has_previous %}{% else %}btn__disabled{% endif %} pagination_prev" {% if page.has_previous %}href="{% pagination_link page.previous_page_number %}"{% endif %}>
+                          <span class="btn_icon__left cf-icon cf-icon-left"></span>
+                          Previous
+                      </a>
+                      <a class="btn btn__super pagination_next {% if page.has_next %}{% else %}btn__disabled{% endif %}" {% if page.has_next %}href="{% pagination_link page.next_page_number %}"{% endif %}>
+                          Next
+                          <span class="btn_icon__right cf-icon cf-icon-right"></span>
+                      </a>
+                      <form class="pagination_form" action="">
+                          <label class="pagination_label"
+                                 for="pagination_current-page">
+                              Page
+                              <span class="u-visually-hidden">
+                                  number out of {{paginator.num_pages}} total pages
+                              </span>
+                          </label>
+                          {% if query %}
+                            <input type="hidden" name="q" value="{{query}}">
+                          {% endif %}
+                				  {% for facet in selected_facets %}
+                            <input type="hidden" name="selected_facets" value="{{facet}}">
+                          {% endfor %}
+                          <input
+                              class="pagination_current-page"
+                              id="pagination_current-page"
+                              name="page"
+                              type="number" min="1" max="{{paginator.num_pages}}"
+                              value="{{page.number}}">
+                          <span class="pagination_label">
+                              <span aria-hidden="true">
+                                  of {{paginator.num_pages}}
+                              </span>
+                          </span>
+                          <button class="btn btn__link pagination_submit"
+                                  id="pagination_submit"
+                                  type="submit">
+                              Go
+                          </button>
+                      </form>
+                  </nav>
+      					{% endif %}
+      					{% empty %}
+                	{% if not selected_category %}	
+                	    <div class="query-search">
+                        {% include "questions/_searchbar.html" with position="right"%} 
+                      </div>
+                      <div class="no-results-message">
+                	      <h2 class="results-header">No results found</h2>
+                        {% if parents %}
+                          <p class="short-desc u-mb30">
+                            {% spaceless %}
+                              <span>Are you looking for information about </span> 
+                              {% for parent in parents%}
+                                {% if not forloop.first %}
+                                  <span> or </span>
+                                {% endif %}
+                                <a href="{% url "kbsearch" %}?selected_facets=category_exact:{{parent.slug}}">{{parent}}</a>
+                              {% endfor %}
+                              <span>?</span>
+                            {% endspaceless %}
+                          </p>
+                        {% else %}
+                          <p class="short-desc u-mb30">Can't find your question? <a href="/askcfpb">Browse questions by category</a><p>
+                        {% endif %}
+                      </div>
+                	  {% endif %}
+      				{% endfor %}
+    				
+    			</section><!-- .search_results -->
+    			{% if page.object_list and not query %}
+            <div class="category-search">
+              {% include "questions/_searchbar.html" with position="right" sidebar=True%} 
+            </div>
+          {% endif %}
+        </section>
+    </div>
+    {% if page.object_list and query %}
+		  {% include "questions/_intro.html" %}
+		{% endif %}
+</main>
+
+{% endblock %}
+
+{% block page_js %}
+
+<script type="text/javascript">
+window.searchCategory ='{{selected_category}}';
+
+
+</script>
+
+<script src="{% static "askcfpb/js/kbsearch.js" %}"></script>
+
+{% endblock %}

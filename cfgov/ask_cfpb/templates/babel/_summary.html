@@ -1,0 +1,6 @@
+                    <a href="{{ a.get_absolute_url }}" class="ac-qa-summary"><article>
+                        <h3 class="ac-qa-question">{{ a.title|safe }}</h3>
+                        <div class="ac-qa-answer">
+                            <p>{{ a.answer|safe|striptags|truncatewords:40 }}</p>
+                        </div>
+                    </article></a>

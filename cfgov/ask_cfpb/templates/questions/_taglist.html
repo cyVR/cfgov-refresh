@@ -1,0 +1,23 @@
+{% load facet_helper %}
+
+<ul class="qtags list list__unstyled">
+  {% for audience in answer.question.audience_strings %}
+      <li class="list_item">
+        <a class="tag" href="{% direct_link_audience audience %}">
+          {{ audience}}
+        </a>
+      </li>
+  {% endfor %}
+  {% for tag in answer.tags %}
+      <li class="list_item">
+        <a class="tag" href={% direct_link_tag tag %}>
+          {{tag|remove_prefix}}
+        </a>
+      </li>
+  {% endfor %}
+  <li class="list_item u-mt20">
+    <a class="btn category-button" style="width: 100%; text-align: center;" href="{{answer.question.question_category.all.0.get_absolute_url}}">            
+      See all {{answer.question.question_category.all.0|lower}} topics
+    </a>
+  </li>
+</ul>

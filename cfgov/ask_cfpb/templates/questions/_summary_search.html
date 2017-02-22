@@ -1,0 +1,5 @@
+{% load facet_helper %}
+<article class="question question_summary">
+	<p class="question_title"><a href="{{q.get_absolute_url}}" class="kbq">{{ q.title|safe }}</a></p>
+ 	<p class="qans">{{ q.answer|striptags|safe|truncatewords:40}}</p>
+</article>

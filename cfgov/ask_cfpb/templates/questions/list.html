@@ -1,0 +1,40 @@
+{% extends "questions/base_kb.html"%}
+{% load sorting %}
+{% load static from staticfiles %}
+
+
+
+{%block breadcrumbs%}
+	<li><a href="/">Home</a></li> <li>Ask CFPB</li>
+{% endblock %}
+
+
+{% block page_js %}
+<script src="{% static "js/search.js" %}"></script>
+	{% if category %}
+	<script>var searchCategory= '{{category.slug}}';</script>
+	{% endif %}
+
+{% endblock %}
+
+
+{% block content %}
+
+
+			{% include "questions/_search.html" %}
+
+			{% include "questions/_list_header.html" %}		
+			
+	
+		<section class="qlist">
+		
+				{% block list_title %}<h2>{{ question_list.name}}</h2>{% endblock %}
+			
+				{% for q in questions %}
+					{% include "questions/_summary.html"%}
+				{% endfor %}
+			
+				{% include "questions/_suggest_a_question.html" %}
+
+		</section>
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends "questions/base_kb_responsive.html"%}
+{% load static from staticfiles %}
+{% load sorting %}
+{% load cache %}
+{% load facet_helper %}
+{% load search %}
+
+{% block title %}Ask CFPB{% endblock %}
+
+{% block page_meta %}
+<meta charset="UTF-8">
+<meta property="og:title" content="Consumer Financial Protection Bureau">
+<meta property="og:description" content="{{ front_page_list.intro_text }}">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+{% endblock %}
+
+{% block open_graph_image %}
+{% if answer.open_graph_image_url %}
+    <meta property="og:image" content="{{ answer.open_graph_image_url }}">
+{% else %}
+    {{ block.super }}
+{% endif %}
+{% endblock %}
+
+{%block breadcrumbs%}
+{% endblock %}
+
+{% block content %}
+
+<main class="ask-landing" role="main">
+
+	<section class="hero">
+    <div class="hero_wrapper wrapper wrapper__match-content">
+      <div class="hero_text">
+        <h1 class="hero_heading">Ask CFPB</h1>
+        <p class="hero_subhead">We offer clear, impartial answers to hundreds of financial questions. Find the information you need to make more informed choices about your money.</p>
+      </div>
+      <div class="hero_image">
+      	<img src="{% static "askcfpb/img/hero_sm_2x.jpg" %}" alt="">
+      </div>
+    </div>
+  </section>
+
+  <div class="content_wrapper">
+		<div class="content-l content-l__full">
+				<section class="content_main content_l-col">
+
+					<h2 class="u-show-on-mobile">Browse questions by category</h2>
+					<ul class="u-show-on-mobile category_list list list__links u-mb0">
+						{% for category in question_categories %}
+							<li class="list_item">
+				      	
+								<a class="list_link jump-link jump-link__right" href="{% url "kbsearch" %}?selected_facets=category_exact:{{category.slug}}">
+	                <span class="jump-link_text">
+										<span class="category-icon cf-icon {{category.slug}}"></span>&nbsp;
+		                {{ category.name }}
+	                </span>
+	              </a>
+							</li>
+	          {% endfor %}
+					</ul>
+
+					<section class="question_categories equal-heights-columns">
+					{% for category in question_categories %}
+						<div class="content-l_col content-l_col-1-3">
+				      <article class="category_summary  block__border block__bg">
+					      <h2>
+					      	<a href="{% url "kbsearch" %}?selected_facets=category_exact:{{category.slug}}">
+										<span class="category-icon cf-icon {{category.slug}}"></span>&nbsp;
+						      	{{ category.name }}
+					      	</a>
+				      	</h2>
+					      <ul class="question_list list__flush-sides u-mt10 u-mb30">
+								{% for a in category.get_english_featured_answers %}
+			            <li>
+			            	
+			            	<a href="{{a.get_absolute_url}}" class="partially-styled-link"> 
+                      <span class="unstyled">{{ a.title|safe }} </span><span class="styled">Read answer</span>
+                    </a>
+			            	
+		            	</li>
+			          {% endfor %}
+			          </ul>
+
+								<p class="short-desc u-mb0">
+									<a href="{% url "kbsearch" %}?selected_facets=category_exact:{{category.slug}}">
+										See all {{ category.name|lower }} questions
+									</a>
+								</p>
+
+				      </article>
+			      </div>
+	        {% endfor %}
+	        </section><!-- .question_categories -->
+
+	        {% if audience_list %}
+	        <section class="topics content-l_col content-l_col-1 u-mt20 u-mb20">
+	          <h4 class="topics_heading">Topics</h4>
+						<ul class="topics_list list__unstyled">
+						  {% for audience in audience_list %}
+	              <li class="topics_topic">
+							    <a href="{% direct_link_audience audience %}" class="topics_link">{{ audience }} 
+								  {% for item in audiences_count %}
+								  	{% if item.name == audience %}
+									    ({{ item.count }})
+									  {% endif %}
+								  {% endfor %}
+									</a>
+								</li>
+						  {% endfor %}
+						</ul>
+					</section><!-- .topics -->
+					{% endif %}
+
+				</section><!-- .content_main -->
+
+				<section class="content-l_col">
+					{% include "questions/_searchbar.html" with position="full"%}
+
+					{% include "questions/_intro.html"%}
+				</section>
+		</div><!-- .content-l__full -->
+
+
+	</div><!-- .content_wrapper -->
+
+
+</main>
+
+
+{% endblock %}
+
+{% block share_box %}
+{% endblock %}
+
+{% block page_js %}
+<script src="{% static 'askcfpb/js/index.js' %}"></script>
+{% endblock %}

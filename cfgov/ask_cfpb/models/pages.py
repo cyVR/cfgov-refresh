@@ -3,11 +3,11 @@ from __future__ import absolute_import
 from django.utils import timezone
 from django.db import models
 
-from modelcluster.fields import ParentalKey
+# from modelcluster.fields import ParentalKey
 from wagtail.wagtailadmin.edit_handlers import (
     FieldPanel,
-    FieldRowPanel,
-    InlinePanel,
+    # FieldRowPanel,
+    # InlinePanel,
     MultiFieldPanel,
     ObjectList,
     TabbedInterface)
@@ -39,7 +39,7 @@ class AnswerPage(CFGOVPage):
         Answer,
         blank=True,
         null=True,
-        # related_name='+',
+        related_name='+',
         on_delete=models.PROTECT)
     is_english = models.BooleanField()
     is_spanish = models.BooleanField()

@@ -1,0 +1,95 @@
+{% load static from staticfiles %}
+{% load facet_helper %}
+
+{% if subcategories|length > 0 or audience_count > 0 %}
+<div class="block block__bg block__flush-sides block__flush-bottom block__bg-extend-right">
+  <h3>What is your question about?</h3>
+
+    <div class="form-group" data-qa-hook="filter-categories">
+      <form class="facets">
+      {% for subcategory in subcategories %}
+          {% if forloop.first %}
+          <ul class="form-l_col form-l_col-1-2 facets_list">
+          {% endif %}
+          {% if forloop.counter == breakpoint %}
+          </ul>
+          <ul class="form-l_col form-l_col-1-2 facets_list">
+          {% endif %}
+          <li>
+          {% ifchanged subcategory.questioncategorygroup %}
+              {% if subcategory.questioncategorygroup.header %}
+              <label class="form-group_item">{{subcategory.questioncategorygroup.header}}</label>
+              {% endif %}
+          {% endifchanged %}
+            <input class="cf-input u-visually-hidden"
+                     type="checkbox"
+                     name="{{subcategory.slug}}"
+                     value="{{subcategory.slug}}"
+                     id="input_{{subcategory.slug}}"
+                     {% if subcategory.slug in selected_categories %}checked="checked"{% endif %}>
+
+              <label class="form-group_item {% if subcategory.questioncategorygroup %}
+                            form-group_item__indented {% endif %}" for="input_{{subcategory.slug}}">
+                  {% if subcategory.slug in selected_categories %}
+                  <a href="{% remove_facet_category subcategory.slug base_uri %}">
+                  {% else %}
+                  <a href="{% subcategory_facet base_uri subcategory.slug %}">
+                  {% endif %}
+                      {{ subcategory.name }}
+                  </a>
+              </label>
+          </li>
+          {% if forloop.last %}
+          </ul>
+          {% endif %}
+        {% endfor %}
+      </form>
+    </div>
+    {% if facets.audience %}
+    <div class="topics topics__askcfpb topics__category-filter">
+      <ul class="topics_list list__unstyled">
+        {% for audience in facets.audience|slice:":10" %}
+          {% if audience.2 %}
+          <li class="topics_topic">
+            <a href="{% remove_facet_audience audience.0 base_uri%}" class="topics_link">{{ audience.0}} ({{ audience.1 }})</a>
+          </li>
+          {% elif audience.1 > 0 %}
+          <li class="topics_topic">
+            <a class="topics_link" href="{% add_facet_audience  audience.0 base_uri%}">{{ audience.0}} ({{ audience.1 }})</a>
+          </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    </div>
+
+{% endif %}
+
+
+{% if selected_categories|length > 0 or selected_audiences|length > 0 %}
+<div class="block block__bg block__flush-sides block__flush-bottom  block__bg-extend-right block__bg-branded block__flush-top">
+<div class="h3"><b>Selected:</b>
+{% spaceless %}
+{% if selected_categories %}
+  {% for cat in selected_categories %}
+      {% for s in subcategories %}
+        {% if  s.slug == cat %}
+          <span>{{s.name}}</span>
+        {% endif %}
+      {% endfor %}
+      {% if forloop.last and selected_audiences|length < 1 %}
+      {% else %}
+        <span>, </span>
+      {% endif %}
+  {% endfor %}
+{% endif %}
+{% if selected_audiences %}
+  {{ selected_audiences|join:", "}}
+{% endif %}
+{% endspaceless %}
+
+</div>
+<p><a class="short-desc" href="{% url "kbsearch" %}?selected_facets=category_exact:{{selected_category.slug}}">Clear selections</a></p>
+</div>
+{% endif %}

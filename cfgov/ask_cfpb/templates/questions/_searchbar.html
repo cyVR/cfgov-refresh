@@ -1,0 +1,38 @@
+<aside class="
+block 
+block__bg-branded 
+{% if position != 'full' %}block__flush-sides {% endif %}
+block__flush-bottom 
+block__bg-extend-{{position}} 
+search-box 
+{% if sidebar %}search-box_with-sidebar{% endif %}
+">
+
+{% if position == 'full' %}
+<div class="content_wrapper">
+{% endif %}
+
+  <div class="content-l search-box_content">
+    <div class="content-l_col content-l_col-1-2 search-box_text">
+
+      <h4 class="u-mb0">Don't see what you're looking for? <span class="break">Search for your question.</span></h4>
+    </div>
+    <div class="content-l_col content-l_col-1-2 search-box_input">
+      <form method="get" action="{% url 'kbsearch' %}" id="kbsearch" >
+        <div class="search-col">
+          <input type="text" name="q" id="q">
+          <span class="search-btn">
+            <button class="btn" name="btnSearch" id="btnSearch">
+              <span class="search-text">Search</span>
+            </button>
+          </span>
+        </div>
+      </form>
+    </div>
+  </div>
+
+{% if position == 'full' %}
+</div><!-- .content_wrapper -->
+{% endif %}
+
+</aside>

@@ -1,0 +1,17 @@
+{% load search %}
+
+<p>The following information helps us understand what you were looking for so we can improve. No information is personally identifiable or will ever be shared.</p>
+        <h2>What you searched for</h2>
+    <ul>
+    {% for term in search_history|slice:":5" %}
+    <li><a href="{% search_term term %}">{{term}}</a></li>
+    {% endfor %}</ul>
+    <h2>answers you looked at</h2>
+    <ul>{% autoescape off %}
+    
+    
+    {% for question in question_history|slice:":5" %}
+    <li><a href="{{ question.get_english_answer.get_absolute_url}}">{{ question.get_english_answer.title }}</a></li>
+    {% endfor %}
+    {% endautoescape %} 
+    </ul>

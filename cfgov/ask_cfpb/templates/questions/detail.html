@@ -1,0 +1,191 @@
+{% extends "questions/base_kb_responsive.html"%}
+{% load static from staticfiles %}
+{% load facet_helper %}
+
+{% block title%}{{answer.title|safe}}{% endblock %}
+
+{% block page_meta %}
+<meta charset="UTF-8">
+<meta property="og:title" content="{{ answer.get_open_graph_title }}">
+{% if answer.one_sentence_answer %}
+  <meta name="description" content="{{ answer.one_sentence_answer|striptags|safe}}">
+  <meta property="og:description" content="{{ answer.one_sentence_answer|striptags|safe}}">
+{% else %}
+  <meta name="description" content="{{ answer.get_open_graph_description}}">
+  <meta property="og:description" content="{{ answer.get_open_graph_description }}">
+{% endif %}
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+
+
+
+{% endblock %}
+
+{% block open_graph_image %}
+{% if answer.open_graph_image_url %}
+    <meta property="og:image" content="{{ answer.open_graph_image_url }}">
+{% else %}
+    {{ block.super }}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+{% include "questions/_intro.html"%}
+<main class="content__2-1 content__bleedbar ask-question" role="main">
+  <div class="content_wrapper ask-question_breadcrumbs">
+    <nav class="breadcrumbs content_intro">
+      <a class="breadcrumbs_link" href="{% url "index_page" %}">
+        Ask CFPB
+      </a>
+      <a class="breadcrumbs_link" href="{{parent_category.get_absolute_url}}">
+        {{parent_category.name}}
+      </a>
+    </nav>
+  </div>
+  <div class="content_wrapper">
+    <section class="content_main content_main__narrow">
+      <article class="ques_detail ques_full" >
+        {% if ask_content_version %}
+          {% if ask_content_version == 'published' %}
+            <h1> Showing PUBLISHED versions, click <a href="?ask_content_version=draft">here</a> to see draft versions. </h1>
+          {% else %}
+            <h1> Showing DRAFT versions, click <a href="?ask_content_version=published">here</a> to see published versions. </h1>
+          {% endif %}
+        {% endif %}
+          <h2 class="ask-question_title">
+            {{ answer.title|safe }}
+          </h2>
+          <div class="ask-question_answer qans" id="main_ques">
+            {% if answer.one_sentence_answer  %}
+              <h3 class="answer-snippet"><strong>Answer: </strong>{{ answer.one_sentence_answer|safe }}</h3>
+            {% endif %}
+
+
+            <div class="read-more read-more__collapsed">
+              <div class="read-more_content" id="answer-content">
+                <div class="answer-text read-more_text read-more_text__uniform">
+                  {{ answer.answer|safe }}
+                </div>
+
+                {% for audience in answer.question.audience_strings %}
+                  {% if forloop.first %}
+                  <div class="topics u-mb20">
+                    <h4 class="topics_heading">Topics</h4>
+                    <ul class="topics_list">
+                  {% endif %}
+                          <li class="topics_topic">
+                            <a class="topics_link" href="{% direct_link_audience audience %}">
+                              {{ audience}}
+                            </a>
+                          </li>
+                    {% if forloop.last %}
+                    </ul>
+                  </div>
+                  {% endif %}
+                {% endfor %}
+
+                <aside class="ask-question_rating" id="rating"></aside>
+                <div class="read-more_gradient"></div>
+              </div>
+              <a class="read-more_target jump-link" title="Expand content">
+                <span class="read-more_link jump-link_text">
+                  <span class="read-more_cue-open">
+                    Read full answer
+                    <span class="cf-icon cf-icon-plus-round"></span>
+                  </span>
+                  <span class="read-more_cue-close">
+                    Hide full answer
+                    <span class="cf-icon cf-icon-minus-round"></span>
+                  </span>
+                </span>
+              </a>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+    <aside class="content_sidebar ask-question_meta">
+
+        <div class="ques_action block block__flush-sides block__border-bottom block__flush-top">
+          {% if answer  %}
+          <div class="next-steps">
+            <h3 class="header-slug">
+                <span class="header-slug_inner">Next steps</span>
+            </h3>
+            {{answer.upsellitem.text|safe}}
+          </div>
+          {% endif %}
+
+        </div>
+
+      <div class="ques_meta">
+        <h3>Other ways to find answers</h3>
+        
+
+        {% for c in categories.itervalues %}
+          {% if forloop.first %}
+            <div class="related">
+          {% endif %}
+          {% for s in c.children.itervalues %}
+            {% if forloop.first %}
+                <h4>Related {{c.title|lower}} subjects</h4>
+                <ul class="list list__unstyled list__spaced">
+            {% endif %}
+            <li class="list_item">
+              <a href="{{s.get_absolute_url}}">{{s.name|safe}}</a>
+            </li>
+            {% if forloop.last %}
+                <li class="list_item">
+                  <a class="btn category-button" href="{{c.url}}">            
+                    See all {{c.title|lower}} questions
+                  </a>
+                </li>
+                </ul>
+            {% endif %}
+          {% endfor %}
+          {% if forloop.last %}
+          </div>
+          {% endif %}
+        {% endfor %}
+        
+      </div>
+
+      {% for a in answer.get_related_answers %}
+        {% if forloop.first %}
+          <div class="related">
+            <h4>Related Questions</h4>
+            <ul class="list list__unstyled">{% endif %}
+              <li class="list_item">
+                <a href="{{a.get_absolute_url}}">{{a.title|safe}}</a>
+              </li>
+              {% if forloop.last %}
+            </ul>
+          </div>
+        {% endif %}
+      {% endfor %}
+
+
+    </aside>
+    <section class="content_main ask-question_search">
+      {% include "questions/_searchbar.html" with position="left" sidebar=True %}         
+    </section>
+
+
+  </div>
+</main>
+
+{% endblock %}
+
+{% block share_box %}
+{% endblock %}
+
+{% block page_js %}
+
+  <script>
+	  var ratingManager= '{{answer.question.get_rating_url}}';
+  	var questionID= '{{answer.question.id}}';
+	</script>
+  <script src="{% static "askcfpb/js/detail.js" %}"></script>
+
+{% endblock %}

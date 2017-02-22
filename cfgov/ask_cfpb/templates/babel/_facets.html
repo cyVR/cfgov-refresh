@@ -1,0 +1,22 @@
+{% load static from staticfiles %}
+{% load facet_helper %}
+
+    {% if facets.tag %}
+                    <h3 class="js-showtoggle-trigger" role="button">Filtrar por:</h3>
+                    <div class="js-showtoggle-content js-showtoggle-content-open">
+                        <ul class="nav-list">
+     {% for tag in facets.tag %} 
+             {% if tag.0 == selected_tag %}
+                            <li><a href="{% remove_babel_facet base_uri %}"><strong>[x] {{ tag.0 }} ({{ tag.1 }})</strong></a></li>
+             {% elif tag.1 > 1 %}   
+                            <li><a href="{% babel_facet base_uri tag.0 %}">{{ tag.0 }} ({{ tag.1 }})</a></li>
+            {% endif %}
+    {% endfor %}
+                        </ul>
+    {% endif %}
+
+<script>
+$(function() {
+    $('.js-showtoggle').cfpbShowToggle();
+});
+</script>

@@ -1,0 +1,12 @@
+
+
+<div>
+<form method="POST" id="followup" action="{{question.get_rating_url}}">
+	{% csrf_token %}
+	<h1>{{form.answer.label}}</h1>
+	{{ form.answer }}<br/>
+	<input type="hidden" name="rating_id" value={{ rating.id}}>
+	<input type="hidden" name="action" value="update">
+	<input type="Submit">
+</form>
+</div>

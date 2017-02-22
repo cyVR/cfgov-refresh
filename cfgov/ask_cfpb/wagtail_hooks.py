@@ -5,56 +5,64 @@ from wagtail.contrib.modeladmin.options import (
 #     CreateView, EditView, InspectView)
 
 from ask_cfpb.models import (
-    Question,
+    # Question,
     QuestionCategory,
     QuestionTopic,
     Answer,
-    EnglishAnswer,
-    SpanishAnswer,
+    Audience,
+    NextStep,
 )
 
 
-# class AudienceModelAdmin(ModelAdmin):
-#     model = Audience
-#     menu_label = 'Audiences'
+class NextStepModelAdmin(ModelAdmin):
+    model = NextStep
+    menu_label = 'Next steps'
 
 
-class QuestionModelAdmin(ModelAdmin):
-    model = Question
-    menu_label = 'Original Questions'
+class AudienceModelAdmin(ModelAdmin):
+    model = Audience
+    menu_label = 'Audiences'
 
 
 class QuestionTopicAdmin(ModelAdmin):
     model = QuestionTopic
     menu_label = 'Question Topics'
+    list_display = (
+        'name', 'name_es', 'intro', 'intro_es')
 
 
 class QuestionCategoryModelAdmin(ModelAdmin):
     model = QuestionCategory
     menu_label = 'Categories'
+    list_display = (
+        'name', 'weight', 'parent'
+    )
+    search_fields = (
+        'name', 'weight')
+    list_filter = ('parent', 'featured')
 
 
 class AnswerModelAdmin(ModelAdmin):
     model = Answer
     menu_label = 'Answers'
     list_display = (
-        'id', 'question', 'question_es', 'topic')
+        'id', 'question', 'question_es', 'topic', 'updated_at', 'created_at')
     search_fields = (
         'id', 'question', 'question_es', 'answer', 'answer_es')
     list_filter = ('topic',)
 
 
-class EnglishAnswerModelAdmin(ModelAdmin):
-    model = EnglishAnswer
-    menu_label = 'Original English Answers'
+# class EnglishAnswerModelAdmin(ModelAdmin):
+#     model = EnglishAnswer
+#     menu_label = 'Original English Answers'
     # create_view_class = JobCategoryCreateView
     # edit_view_class = JobCategoryEditView
     # inspect_view_class = JobCategoryInspectView
 
 
-class SpanishAnswerModelAdmin(ModelAdmin):
-    model = SpanishAnswer
-    menu_label = 'Original Spanish Answers'
+# class SpanishAnswerModelAdmin(ModelAdmin):
+#     model = SpanishAnswer
+#     menu_label = 'Original Spanish Answers'
     # create_view_class = JobCategoryCreateView
     # edit_view_class = JobCategoryEditView
     # inspect_view_class = JobCategoryInspectView
@@ -98,10 +106,10 @@ class MyModelAdminGroup(ModelAdminGroup):
     menu_label = 'Ask CFPB'
     menu_icon = 'folder-open-inverse'
     items = (
-        QuestionModelAdmin,
+        AudienceModelAdmin,
         QuestionTopicAdmin,
         QuestionCategoryModelAdmin,
         AnswerModelAdmin,
-        EnglishAnswerModelAdmin,
-        SpanishAnswerModelAdmin,
+        NextStepModelAdmin,
+        # SpanishAnswerModelAdmin,
     )

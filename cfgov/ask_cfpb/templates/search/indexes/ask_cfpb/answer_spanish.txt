@@ -1,0 +1,11 @@
+{% load accent_stripper %}
+
+{{ object.answer_text_es }} 
+{{ object.answer_text_es|stripaccents }} 
+{{ object.question_es }}
+{{ object.question_es|stripaccents }}
+
+{% for tag in object.tags %}
+tag:{{ tag }}
+tag:{{ tag|stripaccents }}
+{% endfor %}
